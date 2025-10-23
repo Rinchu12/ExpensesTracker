@@ -20,6 +20,7 @@ const EditExpenseScreen: React.FC<Props> = ({ route, navigation }) => {
   const [date, setDate] = useState<Date>(new Date(expense.date));
 
   const handleSave = async () => {
+    if (!amount || Number(amount) === 0) return;
     const current = await getExpenses();
     const updatedExpenses = current.map((e) =>
       e.id === expense.id

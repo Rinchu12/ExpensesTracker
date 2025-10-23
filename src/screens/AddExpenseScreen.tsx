@@ -20,7 +20,7 @@ const AddExpenseScreen: React.FC<Props> = ({ navigation }) => {
   const [date, setDate] = useState<Date>(new Date());
 
   const handleSave = async () => {
-    if (!amount) return;
+    if (!amount || Number(amount) === 0) return;
     const newExpense: Expense = {
       id: generateId(),
       amount: Number(amount),
