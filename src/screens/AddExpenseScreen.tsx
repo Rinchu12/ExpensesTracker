@@ -9,6 +9,7 @@ import { CATEGORIES } from '../constants/categories';
 import { Expense } from '../types/Expense';
 import { SCREENS } from '../constants/screens';
 import DatePickerInput from '../components/DatePickerInput';
+import { generateId } from '../utils/idGenerator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddExpense'>;
 

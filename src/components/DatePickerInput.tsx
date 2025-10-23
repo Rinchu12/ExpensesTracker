@@ -29,6 +29,7 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({ date, onChange }) => 
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           onChange={handleChange}
+          maximumDate={new Date()} // restrict future dates
         />
       )}
     </View>
