@@ -8,28 +8,25 @@ import { saveExpenses, getExpenses } from '../utils/storage';
 import { CATEGORIES } from '../constants/categories';
 import { Expense } from '../types/Expense';
 import { SCREENS } from '../constants/screens';
+import DatePickerInput from '../components/DatePickerInput';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddExpense'>;
 
-const generateId = () => Date.now().toString() + Math.floor(Math.random() * 1000).toString();
-
 const AddExpenseScreen: React.FC<Props> = ({ navigation }) => {
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('Food');
-  const [note, setNote] = useState('');
-  const date = new Date().toISOString().split('T')[0];
+  const [amount, setAmount] = useState<string>('');
+  const [category, setCategory] = useState<string>(CATEGORIES[0]);
+  const [note, setNote] = useState<string>('');
+  const [date, setDate] = useState<Date>(new Date());
 
   const handleSave = async () => {
     if (!amount) return;
-
     const newExpense: Expense = {
       id: generateId(),
       amount: Number(amount),
       category,
       note,
-      date,
+      date: date.toISOString().split('T')[0],
     };
-
     const current = await getExpenses();
     await saveExpenses([...current, newExpense]);
     navigation.navigate(SCREENS.Home);
@@ -44,17 +41,22 @@ const AddExpenseScreen: React.FC<Props> = ({ navigation }) => {
         value={amount}
         onChangeText={setAmount}
       />
+
       <Picker selectedValue={category} onValueChange={setCategory}>
-        {CATEGORIES.map(cat => (
+        {CATEGORIES.map((cat) => (
           <Picker.Item key={cat} label={cat} value={cat} />
         ))}
       </Picker>
+
       <TextInput
         placeholder="Note (optional)"
         style={styles.input}
         value={note}
         onChangeText={setNote}
       />
+
+      <DatePickerInput date={date} onChange={setDate} />
+
       <Button title="Save Expense" onPress={handleSave} />
     </View>
   );
