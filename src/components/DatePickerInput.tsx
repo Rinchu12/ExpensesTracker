@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Platform, StyleSheet } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { Theme } from '../theme/theme';
 
 interface DatePickerInputProps {
   date: Date;
   onChange: (date: Date) => void;
 }
 
-const DatePickerInput: React.FC<DatePickerInputProps> = ({ date, onChange }) => {
+const DatePickerInput: React.FC<DatePickerInputProps & { theme: Theme } > = ({ date, onChange, theme }) => {
   const [showPicker, setShowPicker] = useState(false);
 
   const handlePress = () => setShowPicker(true);
@@ -20,7 +21,7 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({ date, onChange }) => 
   return (
     <View>
       <TouchableOpacity onPress={handlePress} style={styles.input}>
-        <Text>{date.toDateString()}</Text>
+        <Text style={{color: theme.text}}>{date.toDateString()}</Text>
       </TouchableOpacity>
 
       {showPicker && (

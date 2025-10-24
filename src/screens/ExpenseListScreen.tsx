@@ -90,6 +90,7 @@ const {theme} = useTheme();
 
           <DatePickerInput
             date={fromDate || new Date()}
+            theme={theme}
             onChange={date => {
               if (toDate && date > toDate) {
                 showAlert('Invalid Date', 'Start date cannot be after end date.');
@@ -100,6 +101,7 @@ const {theme} = useTheme();
           />
           <DatePickerInput
             date={toDate || new Date()}
+            theme={theme}
             onChange={date => {
               if (fromDate && date < fromDate) {
                 showAlert('Invalid Date', 'End date cannot be before start date.');

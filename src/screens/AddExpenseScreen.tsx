@@ -63,7 +63,7 @@ const AddExpenseScreen: React.FC<Props> = ({ navigation }) => {
         onChangeText={setNote}
       />
 
-      <DatePickerInput date={date} onChange={setDate} />
+      <DatePickerInput date={date} onChange={setDate} theme={theme} />
 
       <Button title="Save Expense" onPress={handleSave} color={theme.primary} />
     </View>
