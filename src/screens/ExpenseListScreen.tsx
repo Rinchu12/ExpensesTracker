@@ -81,6 +81,7 @@ const {theme} = useTheme();
             selectedValue={selectedCategory}
             onValueChange={value => setSelectedCategory(value)}
             style={{ color: theme.text, marginBottom: 10 }}
+            dropdownIconColor={theme.secondaryText}
           >
             <Picker.Item label="All Categories" value="All" />
             {CATEGORIES.map(cat => (

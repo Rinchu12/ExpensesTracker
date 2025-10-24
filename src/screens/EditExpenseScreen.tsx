@@ -46,6 +46,7 @@ const EditExpenseScreen: React.FC<Props> = ({ route, navigation }) => {
       <Picker
         selectedValue={category}
         onValueChange={setCategory}
+        dropdownIconColor={theme.secondaryText}
         style={{ color: theme.text, marginBottom: 10 }}
       >
         {CATEGORIES.map(cat => (

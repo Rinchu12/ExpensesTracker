@@ -49,6 +49,7 @@ const AddExpenseScreen: React.FC<Props> = ({ navigation }) => {
         selectedValue={category}
         onValueChange={setCategory}
         style={{ color: theme.text, marginBottom: 10 }}
+        dropdownIconColor={theme.secondaryText}
       >
         {CATEGORIES.map(cat => (
           <Picker.Item key={cat} label={cat} value={cat} />
