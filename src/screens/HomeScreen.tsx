@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Button,
-  FlatList,
   StyleSheet,
   Dimensions,
 } from 'react-native';
@@ -12,7 +11,6 @@ import { RootStackParamList } from '../navigation/types';
 import { getExpenses } from '../utils/storage';
 import { Expense } from '../types/Expense';
 import CategorySummary from '../components/CategorySummary';
-import ExpenseCard from '../components/ExpenseCard';
 import { SCREENS } from '../constants/screens';
 import { PieChart } from 'react-native-chart-kit';
 import { CATEGORIES } from '../constants/categories';
@@ -42,11 +40,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     [expenses],
   );
 
-  const recentExpenses = useMemo(
-    () => expenses.slice(-5).reverse(),
-    [expenses],
-  );
-
   /** 📊 Memoized chart data to avoid recalculating on every render */
   const chartData = useMemo(
     () =>
@@ -73,11 +66,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     [navigation],
   );
 
-  const handleEditExpense = useCallback(
-    (expense: Expense) => navigation.navigate(SCREENS.EditExpense, { expense }),
-    [navigation],
-  );
-
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.header, { color: theme.text }]}>
@@ -100,25 +88,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           paddingLeft="8"
         />
       )}
-      <Text style={[styles.subHeader, { color: theme.text }]}>
-        Recent Expenses
-      </Text>
-
-      {recentExpenses.length === 0 ? (
-        <Text style={{ color: theme.secondaryText }}>No expenses yet.</Text>
-      ) : (
-        <FlatList
-          data={recentExpenses}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <ExpenseCard
-              item={item}
-              onPress={() => handleEditExpense(item)}
-              theme={theme}
-            />
-          )}
-        />
-      )}
 
       <View style={styles.buttons}>
         <Button
@@ -130,6 +99,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         <Button
           title="View All"
           onPress={handleViewAll}
+          color={theme.primary}
+        />
+        <View style={{ height: 10 }} />
+        <Button
+          title="Toggle Theme"
+          onPress={toggleTheme}
           color={theme.primary}
         />
       </View>
