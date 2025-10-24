@@ -1,14 +1,17 @@
-// src/components/CategorySummary.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Expense } from '../types/Expense';
 import { CATEGORIES } from '../constants/categories';
+import { Theme } from '../theme/theme';
 
 interface Props {
   expenses: Expense[];
 }
 
-const CategorySummary: React.FC<Props> = ({ expenses }) => {
+const CategorySummary: React.FC<Props & { theme: Theme }> = ({
+  expenses,
+  theme,
+}) => {
   const categoryTotals: Record<string, number> = {};
 
   CATEGORIES.forEach(cat => {
@@ -21,11 +24,18 @@ const CategorySummary: React.FC<Props> = ({ expenses }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Category-wise Breakdown</Text>
+      <Text style={[styles.header, { color: theme.text }]}>
+        Category-wise Breakdown
+      </Text>
       {CATEGORIES.map(cat => (
-        <View key={cat} style={styles.row}>
-          <Text style={styles.category}>{cat}</Text>
-          <Text style={styles.amount}>₹{categoryTotals[cat] || 0}</Text>
+        <View
+          key={cat}
+          style={[styles.row, { borderBottomColor: theme.border }]}
+        >
+          <Text style={[styles.category, { color: theme.text }]}>{cat}</Text>
+          <Text style={[styles.amount, { color: theme.primary }]}>
+            ₹{categoryTotals[cat] || 0}
+          </Text>
         </View>
       ))}
     </View>

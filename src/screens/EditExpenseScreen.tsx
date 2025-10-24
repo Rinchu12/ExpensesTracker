@@ -1,4 +1,3 @@
-// src/screens/EditExpenseScreen.tsx
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
@@ -8,6 +7,7 @@ import { getExpenses, saveExpenses } from '../utils/storage';
 import { CATEGORIES } from '../constants/categories';
 import { SCREENS } from '../constants/screens';
 import DatePickerInput from '../components/DatePickerInput';
+import { useTheme } from '../context/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditExpense'>;
 
@@ -18,6 +18,7 @@ const EditExpenseScreen: React.FC<Props> = ({ route, navigation }) => {
   const [category, setCategory] = useState<string>(expense.category);
   const [note, setNote] = useState<string>(expense.note || '');
   const [date, setDate] = useState<Date>(new Date(expense.date));
+  const {theme} = useTheme();
 
   const handleSave = async () => {
     if (!amount || Number(amount) === 0) return;
@@ -32,31 +33,37 @@ const EditExpenseScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <TextInput
         placeholder="Amount"
+        placeholderTextColor={theme.secondaryText}
         keyboardType="numeric"
-        style={styles.input}
+        style={[styles.input, { borderColor: theme.border, color: theme.text }]}
         value={amount}
         onChangeText={setAmount}
       />
 
-      <Picker selectedValue={category} onValueChange={setCategory}>
-        {CATEGORIES.map((cat) => (
+      <Picker
+        selectedValue={category}
+        onValueChange={setCategory}
+        style={{ color: theme.text, marginBottom: 10 }}
+      >
+        {CATEGORIES.map(cat => (
           <Picker.Item key={cat} label={cat} value={cat} />
         ))}
       </Picker>
 
       <TextInput
         placeholder="Note (optional)"
-        style={styles.input}
+        placeholderTextColor={theme.secondaryText}
+        style={[styles.input, { borderColor: theme.border, color: theme.text }]}
         value={note}
         onChangeText={setNote}
       />
 
       <DatePickerInput date={date} onChange={setDate} />
 
-      <Button title="Update Expense" onPress={handleSave} />
+      <Button title="Update Expense" onPress={handleSave} color={theme.primary} />
     </View>
   );
 };

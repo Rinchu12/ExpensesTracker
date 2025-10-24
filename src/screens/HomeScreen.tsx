@@ -1,6 +1,12 @@
-// src/screens/HomeScreen.tsx
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import {
+  View,
+  Text,
+  Button,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { getExpenses } from '../utils/storage';
@@ -8,33 +14,98 @@ import { Expense } from '../types/Expense';
 import CategorySummary from '../components/CategorySummary';
 import ExpenseCard from '../components/ExpenseCard';
 import { SCREENS } from '../constants/screens';
+import { PieChart } from 'react-native-chart-kit';
+import { CATEGORIES } from '../constants/categories';
+import { useTheme } from '../context/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const { theme, toggleTheme } = useTheme();
+  const screenWidth = Dimensions.get('window').width;
+
+  /** 🧩 Fetch Expenses When Screen is Focused */
+  const loadExpenses = useCallback(async () => {
+    const data = await getExpenses();
+    setExpenses(data);
+  }, []);
 
   useEffect(() => {
-    const loadExpenses = async () => {
-      const data = await getExpenses();
-      setExpenses(data);
-    };
     const unsubscribe = navigation.addListener('focus', loadExpenses);
     return unsubscribe;
   }, [navigation]);
 
-  const total = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const recentExpenses = expenses.slice(-5).reverse();
+  /** 🧮 Memoized total and recent expenses */
+  const total = useMemo(
+    () => expenses.reduce((sum, e) => sum + e.amount, 0),
+    [expenses],
+  );
+
+  const recentExpenses = useMemo(
+    () => expenses.slice(-5).reverse(),
+    [expenses],
+  );
+
+  /** 📊 Memoized chart data to avoid recalculating on every render */
+  const chartData = useMemo(
+    () =>
+      CATEGORIES.map(cat => ({
+        name: cat,
+        amount: expenses
+          .filter(e => e.category === cat)
+          .reduce((sum, e) => sum + e.amount, 0),
+        color: `hsl(${Math.random() * 360}, 70%, 60%)`,
+        legendFontColor: '#333',
+        legendFontSize: 13,
+      })),
+    [expenses],
+  );
+
+  /** 🧭 Navigation handlers wrapped in useCallback for stable reference */
+  const handleAddExpense = useCallback(
+    () => navigation.navigate(SCREENS.AddExpense),
+    [navigation],
+  );
+
+  const handleViewAll = useCallback(
+    () => navigation.navigate(SCREENS.ExpenseList),
+    [navigation],
+  );
+
+  const handleEditExpense = useCallback(
+    (expense: Expense) => navigation.navigate(SCREENS.EditExpense, { expense }),
+    [navigation],
+  );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>💰 Total Spent: ₹{total}</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.header, { color: theme.text }]}>
+        💰 Total Spent: ₹{total}
+      </Text>
 
-      <CategorySummary expenses={expenses} />
+      <CategorySummary expenses={expenses} theme={theme} />
+      {expenses.length > 0 && (
+        <PieChart
+          data={chartData}
+          width={screenWidth - 16}
+          height={180}
+          chartConfig={{
+            backgroundColor: theme.background,
+            color: () => theme.primary,
+            labelColor: () => theme.text,
+          }}
+          accessor="amount"
+          backgroundColor="transparent"
+          paddingLeft="8"
+        />
+      )}
+      <Text style={[styles.subHeader, { color: theme.text }]}>
+        Recent Expenses
+      </Text>
 
-      <Text style={styles.subHeader}>Recent Expenses</Text>
       {recentExpenses.length === 0 ? (
-        <Text>No expenses yet.</Text>
+        <Text style={{ color: theme.secondaryText }}>No expenses yet.</Text>
       ) : (
         <FlatList
           data={recentExpenses}
@@ -42,16 +113,25 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           renderItem={({ item }) => (
             <ExpenseCard
               item={item}
-              onPress={() => navigation.navigate(SCREENS.EditExpense, { expense: item })}
+              onPress={() => handleEditExpense(item)}
+              theme={theme}
             />
           )}
         />
       )}
 
       <View style={styles.buttons}>
-        <Button title="Add Expense" onPress={() => navigation.navigate(SCREENS.AddExpense)} />
+        <Button
+          title="Add Expense"
+          onPress={handleAddExpense}
+          color={theme.primary}
+        />
         <View style={{ height: 10 }} />
-        <Button title="View All" onPress={() => navigation.navigate(SCREENS.ExpenseList)} />
+        <Button
+          title="View All"
+          onPress={handleViewAll}
+          color={theme.primary}
+        />
       </View>
     </View>
   );
@@ -62,6 +142,11 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   header: { fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
-  subHeader: { fontSize: 16, fontWeight: '600', marginTop: 20, marginBottom: 8 },
+  subHeader: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 20,
+    marginBottom: 8,
+  },
   buttons: { marginTop: 20 },
 });
