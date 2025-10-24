@@ -49,10 +49,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           .filter(e => e.category === cat)
           .reduce((sum, e) => sum + e.amount, 0),
         color: `hsl(${Math.random() * 360}, 70%, 60%)`,
-        legendFontColor: '#333',
+        legendFontColor: theme.text,
         legendFontSize: 13,
       })),
-    [expenses],
+    [expenses, theme],
   );
 
   /** 🧭 Navigation handlers wrapped in useCallback for stable reference */
@@ -83,6 +83,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             color: () => theme.primary,
             labelColor: () => theme.text,
           }}
+
           accessor="amount"
           backgroundColor="transparent"
           paddingLeft="8"
